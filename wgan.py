@@ -127,13 +127,13 @@ class WassersteinGAN(object):
                 self.d_loss_store.append(rd_loss)  # d_loss will increase
                 self.wdis_store.append(rd_loss)  # Wasserstein distance will decrease
 
-                # # generate image
-                # bz = self.z_sampler(1, self.z_dim) # changed, only generate 1 image
-                # bx = self.sess.run(self.x_, feed_dict={self.z: bz}) # bx.shape: (1, 784)
-                # bx = xs.data2img(bx) # data2img is in __init__.py, bx.shape: (1, 28, 28, 1)
-                # fig = plt.figure(self.data + '.' + self.model)
-                # grid_show(fig, bx, xs.shape)
-                # fig.savefig('result/genefig/{}/{}.jpg'.format(self.data, t)) # changed
+                # generate image
+                bz = self.z_sampler(1, self.z_dim) # changed, only generate 1 image
+                bx = self.sess.run(self.x_, feed_dict={self.z: bz}) # bx.shape: (1, 784)
+                bx = xs.data2img(bx) # data2img is in __init__.py, bx.shape: (1, 28, 28, 1)
+                fig = plt.figure(self.data + '.' + self.model)
+                grid_show(fig, bx, xs.shape)
+                fig.savefig('result/genefig/{}/{}.jpg'.format(self.data, t)) # changed
 
             # if t % self.save_size == 0:  # store generator and discriminator, new added
             #     saver = tf.train.Saver()
@@ -178,16 +178,18 @@ class WassersteinGAN(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('')
     parser.add_argument('--data', type=str, default='mnist')
-    parser.add_argument('--model', type=str, default='mlp')
+    parser.add_argument('--model', type=str, default='dcgan')
     parser.add_argument('--gpus', type=str, default='0')
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
-    digits = ['2', '3', '4', '5']  # MNIST digits need to use
+    # digits = ['2', '3', '4', '5']  # MNIST digits need to use
+    # digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9']  # MNIST digits need to use
+    digits = ['1']
     for digit in digits:
         tf.reset_default_graph()
         data = importlib.import_module(args.data)  # from parser
         model = importlib.import_module(args.data + '.' + args.model)
-        # xs = data.DataSampler() # mnist/__init__.py, xs is a instance of class DataSampler
+        xs = data.DataSampler() # mnist/__init__.py, xs is a instance of class DataSampler
         zs = data.NoiseSampler()
         d_net = model.Discriminator()  # mnist/mlp.py, d_net is a instance of class Discriminator
         g_net = model.Generator()
@@ -201,7 +203,7 @@ if __name__ == '__main__':
         save_size = 100000
         d_iters = 5
         data_name = 'training'
-        data_path = "/home/xieliyan/Desktop/data/MNIST/"
-        path_output = "/home/xieliyan/Dropbox/GPU/GPU3/wgan/result/"
+        data_path = "./mnist/MNIST"
+        path_output = "./result/"
         wgan = WassersteinGAN(g_net, d_net, zs, args.data, args.model, sigma_all, digit, reg, lr, cilpc, batch_size, num_batches, plot_size, save_size, d_iters, data_name, data_path, path_output)
         wgan.train()

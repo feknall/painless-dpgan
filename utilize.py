@@ -10,7 +10,7 @@ import cPickle as pickle
 import os, struct
 from array import array as pyarray
 from numpy import zeros, random, concatenate, copy, array, delete, int8
-# from PIL import Image
+from PIL import Image
 import pandas as pd
 
 def normlization(image):
@@ -38,10 +38,10 @@ def c2b(train, generated, adj):
     v = g[idx] # any value large than this set to 1, o.w. to 0
     putmask(generated, generated<=v, 0.0) # due to the property of putmask, must first set 0 then set 1
     putmask(generated, generated>v, 1.0)
-    print "Nonzero element portion in training data and adjustment value are:"
-    print p, adj
-    print "Nonzero element portion in generated data after adjustment of c2b function:"
-    print float(count_nonzero(generated))/generated.size
+    print("Nonzero element portion in training data and adjustment value are:")
+    print(p, adj)
+    print("Nonzero element portion in generated data after adjustment of c2b function:")
+    print(float(count_nonzero(generated))/generated.size)
     return generated
 
 
@@ -55,9 +55,9 @@ def c2bcolwise(train, generated, adj):
     dependency among features (coordinates), i.e. conditional probability of x1...xd'''
     generated_new = [] # store new one
     s = train.sum(axis=0)
-    print 'Nonzero element in each feature (coordinate) in training data: '
-    print list(map(int, s)) # not in scientific notation
-    print "Adjustment value is: " + str(adj)
+    print('Nonzero element in each feature (coordinate) in training data: ')
+    print(list(map(int, s))) # not in scientific notation
+    print("Adjustment value is: " + str(adj))
     for col in range(len(s)):
         col_train = train[:,col]
         col_generated = generated[:,col]
@@ -72,10 +72,10 @@ def c2bcolwise(train, generated, adj):
         putmask(col_generated, col_generated>v, 1.0)
         generated_new.append(col_generated)
     generated_new = array(generated_new).T
-    print 'Nonzero element in each feature (coordinate) in generated data: '
-    print list(map(int, generated_new.sum(axis=0)))
-    print 'Portion of element that is match between training data and generated data'
-    print float(sum(train == generated_new))/(train.shape[0]*train.shape[1])
+    print('Nonzero element in each feature (coordinate) in generated data: ')
+    print(list(map(int, generated_new.sum(axis=0))))
+    print('Portion of element that is match between training data and generated data')
+    print(float(sum(train == generated_new))/(train.shape[0]*train.shape[1]))
     return generated_new
 
 
@@ -152,14 +152,14 @@ def dwp(r, g, te, db=0.5, C=1.0):
     rv_pro = []
     gv_pro = []
     for i in range(len(r[0])):
-        print i
+        print(i)
         f_r, t_r = split(r, i) # separate feature and target
         f_g, t_g = split(g, i)
         f_te, t_te = split(te, i) # these 6 are all numpy array
         t_g[t_g < db ] = 0  # hard decision boundary
         t_g[t_g >= db ] = 1
         if (unique(t_r).size == 1) or (unique(t_g).size == 1): # if only those coordinates correspondent to top codes are kept, no coordinate should be skipped, if those patients that doesn't contain top ICD9 codes were removed, more coordinates will be skipped
-            print "skip this coordinate"
+            print("skip this coordinate")
             continue
         model_r = linear_model.LogisticRegression(C=C) # logistic regression, if labels are all 0, this will cause: ValueError: This solver needs samples of at least 2 classes in the data, but the data contains only one class: 0
         model_r.fit(f_r, t_r)
@@ -415,8 +415,8 @@ def statistics(r, g, te, col):
 
 def fig_add_noise(List):
     '''adding noise to results to make them distinguishable on figure'''
-    print len(List)
-    print 0.0001*random.randn(len(List))
+    print(len(List))
+    print(0.0001*random.randn(len(List)))
     List_new = List + 0.0001*random.randn(len(List))
     return List_new
 
@@ -434,20 +434,20 @@ def fig_add_noise(List):
 #     return average(im, axis=2).reshape(64,64,1)
 
 
-# def loaddata_face(path):
-#     # for file in os.listdir(path):
-#     #     print file
-#     im_name = array([name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))])
-#     N = len(im_name) # count files in directory
-#     # N = 10
-#     image_n = zeros(shape=(N, 64, 64, 1)) # normalized image
-#     for i in range(N):
-#         jpgfile = Image.open(path + im_name[i])
-#         # print asarray(jpgfile.getdata(),dtype=float64).shape
-#         # print jpgfile.size
-#         # image_n[i] = im_avg(asarray(jpgfile.getdata(),dtype=float64).reshape((jpgfile.size[1],jpgfile.size[0],(asarray(jpgfile.getdata(),dtype=float64).shape)[1])))
-#         image_n[i] = normlization(asarray(jpgfile.getdata(),dtype=float64).reshape((jpgfile.size[1],jpgfile.size[0],1))) # image is averaged
-#     return image_n
+def loaddata_face(path):
+    # for file in os.listdir(path):
+    #     print file
+    im_name = array([name for name in os.listdir(path) if os.path.isfile(os.path.join(path, name))])
+    N = len(im_name) # count files in directory
+    # N = 10
+    image_n = zeros(shape=(N, 64, 64, 1)) # normalized image
+    for i in range(N):
+        jpgfile = Image.open(path + im_name[i])
+        # print asarray(jpgfile.getdata(),dtype=float64).shape
+        # print jpgfile.size
+        # image_n[i] = im_avg(asarray(jpgfile.getdata(),dtype=float64).reshape((jpgfile.size[1],jpgfile.size[0],(asarray(jpgfile.getdata(),dtype=float64).shape)[1])))
+        image_n[i] = normlization(asarray(jpgfile.getdata(),dtype=float64).reshape((jpgfile.size[1],jpgfile.size[0],1))) # image is averaged
+    return image_n
 
 # path = "./face/CelebA/img_align_celeba_50k_1st_r_64_64_1/"
 # im = loaddata_face(path)
@@ -487,8 +487,8 @@ def MNIST_c(file_path, data_path, path_output, digit_pair, number_train, iter, C
 
     files_1st.sort()
     files_2nd.sort()
-    print files_1st
-    print files_2nd
+    print(files_1st)
+    print(files_2nd)
 
     data_train_1st, label_train_1st = loaddata(digit_pair[0], 'training', data_path) # type(label_train_1st[0]): numpy.uint8
     data_train_2nd, label_train_2nd = loaddata(digit_pair[1], 'training', data_path)
@@ -529,7 +529,7 @@ def MNIST_c(file_path, data_path, path_output, digit_pair, number_train, iter, C
     label_test_s = concatenate((label_test_1st, label_test_2nd))
 
     for i in range(iter):
-        print 'iter ' + str(i)
+        print('iter ' + str(i))
 
         # training data
         a1 = random.choice(len(label_train_1st), number_train, replace=False) # random selection
