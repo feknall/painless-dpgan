@@ -26,5 +26,5 @@ that our method can generate high quality data points at a reason-
 able privacy level.
 
 
-## Original Github Repository:
+## Original Github Repository
 https://github.com/illidanlab/dpgan
